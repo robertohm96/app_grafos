@@ -1,14 +1,17 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import type { Vertex, CanvasTool, PredefinedGraph } from './types/graph';
 import { Header } from './components/Header';
-import { GraphCanvas } from './components/GraphCanvas';
 import { TabNavigation } from './components/TabNavigation';
-import type { TabType } from './components/TabNavigation';
-import { MatrixTab } from './components/MatrixTab';
+import type { AppMode } from './components/TabNavigation';
+import { MatrixToGraphSection } from './components/MatrixToGraphSection';
+import { GraphToMatrixSection } from './components/GraphToMatrixSection';
 import { DegreesCoordsTab } from './components/DegreesCoordsTab';
 import { ColoringTab } from './components/ColoringTab';
+import { SavedGraphsTab } from './components/SavedGraphsTab';
+import { SaveGraphModal } from './components/SaveGraphModal';
 import { PREDEFINED_GRAPHS } from './utils/examples';
+import { getSavedGraphs } from './utils/storage';
 import {
   runWelshPowell,
   generateCircularCoords,
@@ -16,9 +19,9 @@ import {
   generateRandomCoords,
 } from './utils/graphAlgorithms';
 import { getColor } from './utils/colors';
+import { Check } from 'lucide-react';
 
 export function App() {
-  // Initialize with MiniWebTool classic example (4 vertices)
   const defaultGraph = PREDEFINED_GRAPHS[0];
 
   const [vertices, setVertices] = useState<Vertex[]>(() => {
@@ -32,15 +35,28 @@ export function App() {
   });
 
   const [matrix, setMatrix] = useState<number[][]>(defaultGraph.matrix);
-  const [activeTab, setActiveTab] = useState<TabType>('matrix');
+  const [activeMode, setActiveMode] = useState<AppMode>('matrixToGraph');
   const [activeTool, setActiveTool] = useState<CanvasTool>('move');
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Load saved count on mount
+  useEffect(() => {
+    setSavedCount(getSavedGraphs().length);
+  }, []);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   // Compute Welsh-Powell coloring reactively
   const coloringResult = useMemo(() => {
     return runWelshPowell(vertices, matrix);
   }, [vertices.length, matrix]);
 
-  // Enrich vertices with their assigned Welsh-Powell color and up-to-date degrees
+  // Enrich vertices with their assigned Welsh-Powell color and degrees
   const enrichedVertices = useMemo(() => {
     return vertices.map((v, idx) => {
       const deg = matrix[idx] ? matrix[idx].reduce((a, b) => a + b, 0) : 0;
@@ -56,18 +72,15 @@ export function App() {
     });
   }, [vertices, matrix, coloringResult.vertexColors]);
 
-  // Trigger celebration on interesting coloring
   const triggerConfetti = useCallback(() => {
     try {
       confetti({
-        particleCount: 45,
+        particleCount: 40,
         spread: 60,
         origin: { y: 0.2 },
         colors: ['#3B82F6', '#EC4899', '#10B981', '#F59E0B', '#8B5CF6'],
       });
-    } catch (e) {
-      // Ignored if confetti not supported
-    }
+    } catch {}
   }, []);
 
   // Update position of a vertex
@@ -126,7 +139,7 @@ export function App() {
     });
   }, [vertices]);
 
-  // Set new matrix (from text parse or invert)
+  // Set new matrix
   const handleSetMatrix = useCallback((newMatrix: number[][]) => {
     const newN = newMatrix.length;
     setMatrix(newMatrix);
@@ -135,7 +148,6 @@ export function App() {
       if (prev.length === newN) {
         return prev;
       }
-      // Re-generate vertices if dimension changed
       const coords = generateCircularCoords(newN, 380, 300);
       return Array.from({ length: newN }, (_, i) => ({
         id: i + 1,
@@ -222,6 +234,7 @@ export function App() {
 
     setVertices(newVertices);
     triggerConfetti();
+    showToast(`Ejemplo cargado: ${graph.name}`);
   }, [triggerConfetti]);
 
   // Load generated graph from Havel-Hakimi
@@ -237,55 +250,76 @@ export function App() {
     }));
     setVertices(newVertices);
     triggerConfetti();
+    setActiveMode('graphToMatrix');
+    showToast('¡Grafo de Havel-Hakimi generado en el estudio!');
+  }, [triggerConfetti]);
+
+  // Load saved graph from storage
+  const handleLoadSavedGraph = useCallback((newVertices: Vertex[], newMatrix: number[][], name: string) => {
+    setVertices(newVertices);
+    setMatrix(newMatrix);
+    triggerConfetti();
+    setActiveMode('graphToMatrix');
+    showToast(`Grafo cargado: "${name}"`);
   }, [triggerConfetti]);
 
   // Reset to empty
   const handleReset = useCallback(() => {
-    setVertices([]);
-    setMatrix([]);
-  }, []);
+    if (vertices.length === 0) return;
+    if (window.confirm('¿Deseas reiniciar y crear un grafo en blanco?')) {
+      setVertices([]);
+      setMatrix([]);
+      showToast('Lienzo en blanco listo para comenzar');
+    }
+  }, [vertices.length]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      {/* Mobile Top Header */}
+    <div className="min-h-screen bg-[#070A10] text-slate-100 flex flex-col font-sans selection:bg-blue-600/30">
+      {/* Top Mobile Header with Safe Area Inset */}
       <Header
         chromaticNumber={coloringResult.chromaticNumber}
         onSelectExample={handleSelectExample}
         onReset={handleReset}
+        onOpenSaveModal={() => setIsSaveModalOpen(true)}
       />
 
       {/* Main Container */}
       <main className="flex-1 w-full max-w-4xl mx-auto p-3 sm:p-5 flex flex-col gap-4">
-        {/* Interactive Colored Canvas View (Sticky/Top prominent) */}
-        <section aria-label="Lienzo del Grafo Coloreado">
-          <GraphCanvas
-            vertices={enrichedVertices}
-            matrix={matrix}
-            activeTool={activeTool}
-            setActiveTool={setActiveTool}
-            onUpdateVertexPos={handleUpdateVertexPos}
-            onAddVertex={handleAddVertexAt}
-            onToggleEdge={handleToggleEdge}
-            onDeleteVertex={handleDeleteVertex}
-            onApplyLayout={handleApplyLayout}
-          />
-        </section>
+        {/* Toast Notification Pill */}
+        {toastMessage && (
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-200">
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/95 border border-blue-500/50 text-blue-200 text-xs font-semibold rounded-full shadow-2xl backdrop-blur-xl">
+              <Check className="w-4 h-4 text-emerald-400" />
+              <span>{toastMessage}</span>
+            </div>
+          </div>
+        )}
 
-        {/* Tab Navigation Segmented Bar */}
-        <section aria-label="Navegación de Secciones">
+        {/* 5-Mode Navigation Bar (Fable Studio Nav) */}
+        <section aria-label="Navegación de Modos de la Aplicación">
           <TabNavigation
-            activeTab={activeTab}
-            onChangeTab={setActiveTab}
+            activeMode={activeMode}
+            onChangeMode={setActiveMode}
             chromaticNumber={coloringResult.chromaticNumber}
+            savedCount={savedCount}
           />
         </section>
 
-        {/* Tab Content Panes */}
-        <section className="flex-1 pb-12">
-          {activeTab === 'matrix' && (
-            <MatrixTab
+        {/* Dynamic Mode Views */}
+        <section className="flex-1 pb-16">
+          {/* Section 1: DE MATRIZ A GRAFO */}
+          {activeMode === 'matrixToGraph' && (
+            <MatrixToGraphSection
               vertices={enrichedVertices}
               matrix={matrix}
+              chromaticNumber={coloringResult.chromaticNumber}
+              activeTool={activeTool}
+              setActiveTool={setActiveTool}
+              onUpdateVertexPos={handleUpdateVertexPos}
+              onAddVertex={handleAddVertexAt}
+              onToggleEdge={handleToggleEdge}
+              onDeleteVertex={handleDeleteVertex}
+              onApplyLayout={handleApplyLayout}
               onToggleCell={handleToggleEdge}
               onSetMatrix={handleSetMatrix}
               onAddVertexSimple={handleAddVertexSimple}
@@ -293,7 +327,34 @@ export function App() {
             />
           )}
 
-          {activeTab === 'degrees' && (
+          {/* Section 2: DE GRAFO A MATRIZ */}
+          {activeMode === 'graphToMatrix' && (
+            <GraphToMatrixSection
+              vertices={enrichedVertices}
+              matrix={matrix}
+              chromaticNumber={coloringResult.chromaticNumber}
+              activeTool={activeTool}
+              setActiveTool={setActiveTool}
+              onUpdateVertexPos={handleUpdateVertexPos}
+              onAddVertex={handleAddVertexAt}
+              onToggleEdge={handleToggleEdge}
+              onDeleteVertex={handleDeleteVertex}
+              onApplyLayout={handleApplyLayout}
+              onOpenSaveModal={() => setIsSaveModalOpen(true)}
+            />
+          )}
+
+          {/* Section 3: COLORACIÓN & WELSH-POWELL */}
+          {activeMode === 'coloring' && (
+            <ColoringTab
+              vertices={enrichedVertices}
+              matrix={matrix}
+              coloringResult={coloringResult}
+            />
+          )}
+
+          {/* Section 4: HAVEL-HAKIMI & GRADOS */}
+          {activeMode === 'degrees' && (
             <DegreesCoordsTab
               vertices={enrichedVertices}
               matrix={matrix}
@@ -304,15 +365,31 @@ export function App() {
             />
           )}
 
-          {activeTab === 'coloring' && (
-            <ColoringTab
-              vertices={enrichedVertices}
-              matrix={matrix}
-              coloringResult={coloringResult}
+          {/* Section 5: MIS GRAFOS GUARDADOS */}
+          {activeMode === 'saved' && (
+            <SavedGraphsTab
+              onLoadGraph={handleLoadSavedGraph}
+              onOpenSaveModal={() => setIsSaveModalOpen(true)}
             />
           )}
         </section>
       </main>
+
+      {/* Save Graph Modal */}
+      <SaveGraphModal
+        isOpen={isSaveModalOpen}
+        onClose={() => {
+          setIsSaveModalOpen(false);
+          setSavedCount(getSavedGraphs().length);
+        }}
+        vertices={enrichedVertices}
+        matrix={matrix}
+        chromaticNumber={coloringResult.chromaticNumber}
+        onSavedSuccess={(name) => {
+          setSavedCount(getSavedGraphs().length);
+          showToast(`¡Grafo "${name}" guardado en tu dispositivo!`);
+        }}
+      />
     </div>
   );
 }

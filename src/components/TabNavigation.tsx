@@ -1,69 +1,104 @@
 import React from 'react';
-import { Grid3X3, Sliders, Palette } from 'lucide-react';
+import {
+  Grid3X3,
+  Paintbrush,
+  Palette,
+  Sliders,
+  FolderHeart,
+} from 'lucide-react';
 
-export type TabType = 'matrix' | 'degrees' | 'coloring';
+export type AppMode =
+  | 'matrixToGraph'
+  | 'graphToMatrix'
+  | 'coloring'
+  | 'degrees'
+  | 'saved';
 
 interface TabNavigationProps {
-  activeTab: TabType;
-  onChangeTab: (tab: TabType) => void;
+  activeMode: AppMode;
+  onChangeMode: (mode: AppMode) => void;
   chromaticNumber: number;
+  savedCount: number;
 }
 
 export const TabNavigation: React.FC<TabNavigationProps> = ({
-  activeTab,
-  onChangeTab,
+  activeMode,
+  onChangeMode,
   chromaticNumber,
+  savedCount,
 }) => {
   const tabs = [
     {
-      id: 'matrix' as TabType,
-      label: 'Matriz',
-      sublabel: '0 / 1 & Texto',
+      id: 'matrixToGraph' as AppMode,
+      label: 'Matriz ➔ Grafo',
+      shortLabel: 'Matriz a Grafo',
       icon: Grid3X3,
+      badge: 'Constructor',
     },
     {
-      id: 'degrees' as TabType,
-      label: 'Grados & Coords',
-      sublabel: 'Havel-Hakimi',
-      icon: Sliders,
+      id: 'graphToMatrix' as AppMode,
+      label: 'Grafo ➔ Matriz',
+      shortLabel: 'Grafo a Matriz',
+      icon: Paintbrush,
+      badge: 'Lienzo',
     },
     {
-      id: 'coloring' as TabType,
+      id: 'coloring' as AppMode,
       label: 'Coloración',
-      sublabel: `χ = ${chromaticNumber}`,
+      shortLabel: 'Coloración',
       icon: Palette,
-      badge: chromaticNumber,
+      badge: `χ=${chromaticNumber}`,
+    },
+    {
+      id: 'degrees' as AppMode,
+      label: 'Havel-Hakimi',
+      shortLabel: 'Grados',
+      icon: Sliders,
+      badge: 'Teoría',
+    },
+    {
+      id: 'saved' as AppMode,
+      label: 'Mis Grafos',
+      shortLabel: 'Guardados',
+      icon: FolderHeart,
+      badge: savedCount > 0 ? `${savedCount}` : undefined,
     },
   ];
 
   return (
-    <div className="w-full bg-slate-950/90 p-1.5 rounded-2xl border border-slate-800 shadow-xl backdrop-blur-md">
-      <div className="grid grid-cols-3 gap-1.5">
+    <div className="w-full bg-slate-950/95 p-1.5 rounded-2xl border border-slate-800/90 shadow-2xl backdrop-blur-xl">
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 px-0.5">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
+          const isActive = activeMode === tab.id;
 
           return (
             <button
               key={tab.id}
-              onClick={() => onChangeTab(tab.id)}
-              className={`flex flex-col items-center justify-center py-2.5 px-1 rounded-xl transition-all active:scale-[0.98] min-h-[50px] relative ${
+              onClick={() => onChangeMode(tab.id)}
+              className={`flex-1 min-w-[76px] sm:min-w-[110px] flex flex-col items-center justify-center py-2 px-1.5 rounded-xl transition-all active:scale-[0.97] min-h-[48px] relative shrink-0 ${
                 isActive
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 ring-1 ring-blue-400/50'
+                  ? 'bg-gradient-to-b from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 ring-1 ring-blue-400/50'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
               }`}
             >
-              <div className="flex items-center gap-1.5">
-                <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                <span className="text-xs font-bold leading-none">{tab.label}</span>
+              <div className="flex items-center gap-1">
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                <span className="text-[11px] font-bold leading-none whitespace-nowrap">
+                  {tab.shortLabel}
+                </span>
               </div>
-              <span
-                className={`text-[10px] mt-1 leading-none font-mono font-medium ${
-                  isActive ? 'text-blue-100' : 'text-slate-500'
-                }`}
-              >
-                {tab.sublabel}
-              </span>
+              {tab.badge && (
+                <span
+                  className={`text-[9px] mt-1 px-1.5 py-0.2 rounded-full font-mono font-semibold leading-none ${
+                    isActive
+                      ? 'bg-white/20 text-blue-100'
+                      : 'bg-slate-900 text-slate-500 border border-slate-800'
+                  }`}
+                >
+                  {tab.badge}
+                </span>
+              )}
             </button>
           );
         })}

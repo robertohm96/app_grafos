@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Sparkles,
   HelpCircle,
+  BookmarkPlus,
   X,
 } from 'lucide-react';
 
@@ -14,12 +15,14 @@ interface HeaderProps {
   chromaticNumber: number;
   onSelectExample: (graph: PredefinedGraph) => void;
   onReset: () => void;
+  onOpenSaveModal: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   chromaticNumber,
   onSelectExample,
   onReset,
+  onOpenSaveModal,
 }) => {
   const [showExamplesModal, setShowExamplesModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
@@ -33,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
     >
       <div className="max-w-4xl mx-auto flex items-center justify-between gap-2">
         {/* Brand & Title */}
-        <div className="flex items-center gap-2.5 min-w-0 shrink">
+        <div className="flex items-center gap-2 min-w-0 shrink">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-pink-500 p-0.5 shadow-lg shadow-indigo-500/30 flex items-center justify-center shrink-0">
             <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
               <span className="font-mono text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-pink-400">
@@ -47,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
                 GraphColor <span className="text-blue-400 font-mono">Pro</span>
               </h1>
               <span className="text-[10px] bg-blue-500/20 text-blue-300 px-1.5 py-0.5 rounded font-mono font-bold border border-blue-500/30">
-                v2.0
+                v2.1
               </span>
             </div>
             <p className="text-[10px] text-slate-400 truncate mt-0.5 hidden xs:block">
@@ -56,31 +59,41 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Right Action Group: Generous touch targets for mobile */}
+        {/* Right Action Group */}
         <div className="flex items-center gap-1.5 shrink-0">
           {/* Chromatic Number Badge */}
           <div
-            className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-blue-950/90 to-purple-950/90 border border-indigo-500/50 rounded-xl shadow-md min-h-[42px]"
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-gradient-to-r from-blue-950/90 to-purple-950/90 border border-indigo-500/50 rounded-xl shadow-md min-h-[42px]"
             title="Número Cromático estimado por Welsh-Powell"
           >
-            <span className="text-[11px] font-bold text-indigo-300">χ(G)=</span>
+            <span className="text-[10px] font-bold text-indigo-300">χ(G)=</span>
             <span className="text-lg font-black text-white font-mono leading-none">
               {chromaticNumber}
             </span>
           </div>
 
-          {/* Examples Dropdown Trigger: Big touch button */}
+          {/* Quick Save Graph Button */}
+          <button
+            onClick={onOpenSaveModal}
+            className="flex items-center gap-1 px-2.5 py-2 bg-gradient-to-r from-blue-600/30 to-indigo-600/30 hover:from-blue-600/50 hover:to-indigo-600/50 active:scale-95 text-blue-300 hover:text-white text-xs font-bold rounded-xl border border-blue-500/40 shadow-sm transition min-h-[42px]"
+            title="Guardar grafo con nombre personalizado"
+          >
+            <BookmarkPlus className="w-4 h-4 text-blue-400 shrink-0" />
+            <span className="text-xs font-bold hidden xs:inline">Guardar</span>
+          </button>
+
+          {/* Examples Dropdown Trigger */}
           <button
             onClick={() => setShowExamplesModal(true)}
-            className="flex items-center gap-1 px-3 py-2 bg-slate-800/90 hover:bg-slate-750 active:scale-95 text-slate-100 text-xs font-bold rounded-xl border border-slate-700 shadow-md transition min-h-[42px]"
+            className="flex items-center gap-1 px-2.5 py-2 bg-slate-800/90 hover:bg-slate-750 active:scale-95 text-slate-100 text-xs font-bold rounded-xl border border-slate-700 shadow-sm transition min-h-[42px]"
             title="Cargar grafos clásicos predefinidos"
           >
-            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-            <span className="text-xs">Ejemplos</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="text-xs hidden xs:inline">Ejemplos</span>
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
           </button>
 
-          {/* Reset Button: 42x42px touch area */}
+          {/* Reset Button */}
           <button
             onClick={onReset}
             className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-rose-400 bg-slate-900/90 hover:bg-slate-800 active:scale-95 rounded-xl border border-slate-800 hover:border-rose-500/40 shadow-sm transition"
@@ -90,7 +103,7 @@ export const Header: React.FC<HeaderProps> = ({
             <RotateCcw className="w-4 h-4" />
           </button>
 
-          {/* Help Info Button: 42x42px touch area */}
+          {/* Help Info Button */}
           <button
             onClick={() => setShowInfoModal(true)}
             className="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-blue-400 bg-slate-900/90 hover:bg-slate-800 active:scale-95 rounded-xl border border-slate-800 hover:border-blue-500/40 shadow-sm transition"
