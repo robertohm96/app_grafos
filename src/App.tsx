@@ -263,7 +263,6 @@ export function App() {
       {/* Top Mobile Header */}
       <Header
         chromaticNumber={coloringResult.chromaticNumber}
-        onSelectExample={handleSelectExample}
         onReset={handleReset}
         onOpenSaveModal={() => setIsSaveModalOpen(true)}
       />
