@@ -9,55 +9,58 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #070a10;
-  color: #f1f5f9;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #09090b;
+  color: #f4f4f5;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
 }
 
-/* Global scrollbar */
+/* Minimalist visible scrollbar across the whole app */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #070a10;
+  background: #18181b;
 }
 ::-webkit-scrollbar-thumb {
-  background: #233559;
+  background: #3f3f46;
   border-radius: 9999px;
+  border: 1px solid #18181b;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6;
+  background: #71717a;
 }
 
-/* High-contrast visible scrollbar class (La barrita lateral visible para celular y PC) */
-.custom-scroll {
+/* High-contrast permanently visible scrollbar class (La barrita lateral visible) */
+.custom-scroll-bar {
   overflow-y: scroll !important;
-  scrollbar-width: auto;
-  scrollbar-color: #3b82f6 #090e1a;
-  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin !important;
+  scrollbar-color: #52525b #18181b !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
-.custom-scroll::-webkit-scrollbar {
-  width: 8px !important;
+.custom-scroll-bar::-webkit-scrollbar {
+  width: 10px !important;
   display: block !important;
 }
 
-.custom-scroll::-webkit-scrollbar-track {
-  background: #090e1a !important;
-  border-radius: 8px;
+.custom-scroll-bar::-webkit-scrollbar-track {
+  background: #18181b !important;
+  border-left: 1px solid #27272a !important;
+  border-radius: 8px !important;
 }
 
-.custom-scroll::-webkit-scrollbar-thumb {
+.custom-scroll-bar::-webkit-scrollbar-thumb {
   background: #3b82f6 !important;
-  border-radius: 8px;
+  border-radius: 8px !important;
+  border: 2px solid #18181b !important;
 }
 
-.custom-scroll::-webkit-scrollbar-thumb:hover {
+.custom-scroll-bar::-webkit-scrollbar-thumb:hover {
   background: #60a5fa !important;
 }
 

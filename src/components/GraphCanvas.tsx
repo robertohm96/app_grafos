@@ -41,7 +41,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   const [viewBoxWidth, setViewBoxWidth] = useState<number>(380);
   const [viewBoxHeight, setViewBoxHeight] = useState<number>(320);
 
-  // Resize listener to adjust coordinate bounds
   useEffect(() => {
     const handleResize = () => {
       if (svgRef.current) {
@@ -57,7 +56,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Convert client pointer coordinates to SVG coordinate system
   const getSvgCoordinates = (e: React.PointerEvent<SVGSVGElement>) => {
     if (!svgRef.current) return { x: 0, y: 0 };
     const rect = svgRef.current.getBoundingClientRect();
@@ -71,7 +69,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     };
   };
 
-  // Pointer Down on Canvas background
   const handleCanvasPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (activeTool === 'add') {
       const { x, y } = getSvgCoordinates(e);
@@ -81,7 +78,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     }
   };
 
-  // Pointer Down on a Vertex
   const handleVertexPointerDown = (e: React.PointerEvent, vertex: Vertex, index: number) => {
     e.stopPropagation();
 
@@ -107,7 +103,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     }
   };
 
-  // Pointer Move (dragging)
   const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
     if (draggingVertexId !== null && activeTool === 'move') {
       const { x, y } = getSvgCoordinates(e);
@@ -117,14 +112,12 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
     }
   };
 
-  // Pointer Up
   const handlePointerUp = () => {
     if (draggingVertexId !== null) {
       setDraggingVertexId(null);
     }
   };
 
-  // Extract edges from adjacency matrix
   const edges: { u: number; v: number; uIdx: number; vIdx: number }[] = [];
   for (let i = 0; i < matrix.length; i++) {
     for (let j = i + 1; j < (matrix[i]?.length || 0); j++) {
@@ -140,20 +133,20 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   }
 
   return (
-    <div className="relative flex flex-col w-full bg-slate-950/90 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-md">
-      {/* Primary Tool Selector: Generous 4-segment full width bar for mobile fingers */}
-      <div className="p-2 bg-slate-900 border-b border-slate-800">
-        <div className="grid grid-cols-4 gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800/80">
+    <div className="relative flex flex-col w-full bg-zinc-950 rounded-2xl border border-zinc-800 shadow-md overflow-hidden">
+      {/* Primary Tool Selector: Minimalist High-Contrast Bar */}
+      <div className="p-2 bg-zinc-900 border-b border-zinc-800">
+        <div className="grid grid-cols-4 gap-1.5 bg-zinc-950 p-1.5 rounded-xl border border-zinc-800">
           {/* Mover */}
           <button
             onClick={() => {
               setActiveTool('move');
               setConnectSourceIdx(null);
             }}
-            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg font-bold text-xs transition-all active:scale-95 min-h-[46px] ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg text-xs transition-all active:scale-95 min-h-[46px] ${
               activeTool === 'move'
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 ring-1 ring-blue-400'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                ? 'bg-zinc-100 text-zinc-950 font-bold shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
             }`}
           >
             <Move className="w-4 h-4 shrink-0" />
@@ -166,10 +159,10 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
               setActiveTool('add');
               setConnectSourceIdx(null);
             }}
-            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg font-bold text-xs transition-all active:scale-95 min-h-[46px] ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg text-xs transition-all active:scale-95 min-h-[46px] ${
               activeTool === 'add'
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                ? 'bg-zinc-100 text-zinc-950 font-bold shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
             }`}
           >
             <PlusCircle className="w-4 h-4 shrink-0" />
@@ -181,10 +174,10 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
             onClick={() => {
               setActiveTool('connect');
             }}
-            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg font-bold text-xs transition-all active:scale-95 min-h-[46px] ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg text-xs transition-all active:scale-95 min-h-[46px] ${
               activeTool === 'connect'
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 ring-1 ring-purple-400'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                ? 'bg-zinc-100 text-zinc-950 font-bold shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
             }`}
           >
             <Link2 className="w-4 h-4 shrink-0" />
@@ -197,10 +190,10 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
               setActiveTool('delete');
               setConnectSourceIdx(null);
             }}
-            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg font-bold text-xs transition-all active:scale-95 min-h-[46px] ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg text-xs transition-all active:scale-95 min-h-[46px] ${
               activeTool === 'delete'
-                ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/30 ring-1 ring-rose-400'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                ? 'bg-zinc-100 text-zinc-950 font-bold shadow-sm'
+                : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
             }`}
           >
             <Trash2 className="w-4 h-4 shrink-0" />
@@ -209,87 +202,82 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         </div>
       </div>
 
-      {/* Sub-bar: Instructions & Layout quick buttons with comfortable touch size */}
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-900/95 border-b border-slate-800 text-xs gap-2">
-        {/* Helper Hint */}
+      {/* Sub-bar: Status hint & Layout buttons */}
+      <div className="flex items-center justify-between px-3 py-2 bg-zinc-900/90 border-b border-zinc-800 text-xs gap-2">
         <div className="flex items-center gap-1.5 text-[11px] font-medium min-w-0">
           {activeTool === 'move' && (
-            <span className="text-blue-300 truncate">
-              💡 Arrastra cualquier nodo para reubicarlo
+            <span className="text-zinc-300 truncate">
+              Arrastra cualquier nodo para reubicarlo
             </span>
           )}
           {activeTool === 'add' && (
-            <span className="text-emerald-300 truncate font-semibold">
-              👉 Toca cualquier punto del lienzo para ubicar un vértice
+            <span className="text-zinc-200 truncate font-semibold">
+              Toca el lienzo para agregar un vértice
             </span>
           )}
           {activeTool === 'connect' && (
-            <span className="text-purple-300 truncate font-semibold animate-pulse">
+            <span className="text-zinc-200 truncate font-semibold">
               {connectSourceIdx === null
-                ? '🔗 Toca el 1er vértice a conectar'
-                : `🔗 Toca otro vértice para unirlo con ${vertices[connectSourceIdx]?.label}`}
+                ? 'Toca el 1er vértice a conectar'
+                : `Toca otro vértice para unir con ${vertices[connectSourceIdx]?.label}`}
             </span>
           )}
           {activeTool === 'delete' && (
-            <span className="text-rose-300 truncate font-semibold">
-              🗑️ Toca un vértice o arista para eliminarlo
+            <span className="text-zinc-300 truncate font-semibold">
+              Toca un vértice o arista para eliminar
             </span>
           )}
         </div>
 
-        {/* Layout quick action buttons */}
         <div className="flex items-center gap-1 shrink-0">
           <button
             onClick={() => onApplyLayout('circular')}
-            className="flex items-center gap-1 px-2.5 py-1.5 text-slate-300 hover:text-cyan-400 bg-slate-800/80 hover:bg-slate-800 active:scale-95 rounded-lg border border-slate-700/80 transition min-h-[34px]"
+            className="px-2.5 py-1 text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 active:scale-95 rounded-lg border border-zinc-700 transition min-h-[32px] text-[10px] font-medium flex items-center gap-1"
             title="Acomodo Circular"
           >
-            <CircleDot className="w-3.5 h-3.5 text-blue-400" />
-            <span className="text-[10px] font-semibold hidden xs:inline">Circular</span>
+            <CircleDot className="w-3.5 h-3.5 text-zinc-400" />
+            <span className="hidden xs:inline">Circular</span>
           </button>
           <button
             onClick={() => onApplyLayout('grid')}
-            className="flex items-center gap-1 px-2.5 py-1.5 text-slate-300 hover:text-cyan-400 bg-slate-800/80 hover:bg-slate-800 active:scale-95 rounded-lg border border-slate-700/80 transition min-h-[34px]"
+            className="px-2.5 py-1 text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 active:scale-95 rounded-lg border border-zinc-700 transition min-h-[32px] text-[10px] font-medium flex items-center gap-1"
             title="Acomodo en Cuadrícula"
           >
-            <Grid className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="text-[10px] font-semibold hidden xs:inline">Cuadrícula</span>
+            <Grid className="w-3.5 h-3.5 text-zinc-400" />
+            <span className="hidden xs:inline">Cuadrícula</span>
           </button>
           <button
             onClick={() => onApplyLayout('random')}
-            className="flex items-center gap-1 px-2.5 py-1.5 text-slate-300 hover:text-cyan-400 bg-slate-800/80 hover:bg-slate-800 active:scale-95 rounded-lg border border-slate-700/80 transition min-h-[34px]"
+            className="px-2.5 py-1 text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 active:scale-95 rounded-lg border border-zinc-700 transition min-h-[32px] text-[10px] font-medium flex items-center gap-1"
             title="Acomodo Aleatorio"
           >
-            <Shuffle className="w-3.5 h-3.5 text-purple-400" />
-            <span className="text-[10px] font-semibold hidden xs:inline">Azar</span>
+            <Shuffle className="w-3.5 h-3.5 text-zinc-400" />
+            <span className="hidden xs:inline">Azar</span>
           </button>
         </div>
       </div>
 
-      {/* Interactive SVG Canvas */}
+      {/* Interactive Minimalist SVG Canvas */}
       <div className="relative w-full h-[290px] sm:h-[330px] select-none touch-none overflow-hidden cursor-crosshair">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
-          className="w-full h-full bg-[#070b13]"
+          className="w-full h-full bg-[#0a0a0c]"
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
         >
           <defs>
-            {/* Fine Grid Pattern */}
             <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#17223b" strokeWidth="0.8" />
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#16161a" strokeWidth="0.8" />
             </pattern>
-            {/* Major Grid Pattern */}
             <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
               <rect width="100" height="100" fill="url(#smallGrid)" />
-              <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#233559" strokeWidth="1.2" />
+              <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#222228" strokeWidth="1" />
             </pattern>
           </defs>
 
-          {/* Grid Background */}
           <rect width="100%" height="100%" fill="url(#grid)" />
 
           {/* Edges */}
@@ -307,7 +295,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
 
               return (
                 <g key={`edge-${edge.u}-${edge.v}`}>
-                  {/* Invisible thicker stroke for easier touch interaction in delete mode */}
                   <line
                     x1={u.x}
                     y1={u.y}
@@ -323,14 +310,13 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                       }
                     }}
                   />
-                  {/* Rendered Edge Line */}
                   <line
                     x1={u.x}
                     y1={u.y}
                     x2={v.x}
                     y2={v.y}
-                    stroke={isHighlighted ? '#60A5FA' : '#475569'}
-                    strokeWidth={isHighlighted ? '2.5' : '1.8'}
+                    stroke={isHighlighted ? '#FFFFFF' : '#4B5563'}
+                    strokeWidth={isHighlighted ? '2' : '1.5'}
                     className="transition-colors duration-150"
                   />
                 </g>
@@ -338,18 +324,16 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
             })}
           </g>
 
-          {/* Connecting preview animated ring when source node is selected */}
+          {/* Connecting preview animated ring */}
           {activeTool === 'connect' && connectSourceIdx !== null && vertices[connectSourceIdx] && (
             <circle
               cx={vertices[connectSourceIdx].x}
               cy={vertices[connectSourceIdx].y}
               r="28"
               fill="none"
-              stroke="#C084FC"
-              strokeWidth="3"
-              strokeDasharray="5 5"
-              className="animate-spin"
-              style={{ transformOrigin: `${vertices[connectSourceIdx].x}px ${vertices[connectSourceIdx].y}px` }}
+              stroke="#FFFFFF"
+              strokeWidth="2"
+              strokeDasharray="4 4"
             />
           )}
 
@@ -359,7 +343,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
               const isSelectedForConnect = connectSourceIdx === index;
               const isDragging = draggingVertexId === vertex.id;
               const isHovered = hoveredVertexId === vertex.id;
-              const colorHex = vertex.colorHex || '#3B82F6';
+              const colorHex = vertex.colorHex || '#2563EB';
 
               return (
                 <g
@@ -369,7 +353,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                   onPointerEnter={() => setHoveredVertexId(vertex.id)}
                   onPointerLeave={() => setHoveredVertexId(null)}
                 >
-                  {/* Invisible generous hit target for thick mobile fingers */}
+                  {/* Invisible hit target for fingers */}
                   <circle
                     cx={vertex.x}
                     cy={vertex.y}
@@ -377,28 +361,27 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                     fill="transparent"
                   />
 
-                  {/* Outer selection / glow ring */}
+                  {/* Outer selection ring */}
                   {(isSelectedForConnect || isDragging || isHovered) && (
                     <circle
                       cx={vertex.x}
                       cy={vertex.y}
                       r="23"
                       fill="none"
-                      stroke={isSelectedForConnect ? '#C084FC' : colorHex}
-                      strokeWidth="2.5"
-                      opacity="0.85"
+                      stroke="#FFFFFF"
+                      strokeWidth="2"
+                      opacity="0.8"
                     />
                   )}
 
-                  {/* Main Node Circle with Welsh-Powell Color */}
+                  {/* Main Node Circle with Minimalist Color */}
                   <circle
                     cx={vertex.x}
                     cy={vertex.y}
                     r="17"
                     fill={colorHex}
-                    stroke="#0B0F19"
+                    stroke="#09090B"
                     strokeWidth="2.5"
-                    filter="drop-shadow(0 2px 6px rgba(0,0,0,0.6))"
                   />
 
                   {/* Vertex Label */}
@@ -408,10 +391,9 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                     textAnchor="middle"
                     fill="#FFFFFF"
                     fontSize="11.5"
-                    fontWeight="800"
+                    fontWeight="700"
                     fontFamily="sans-serif"
                     className="pointer-events-none select-none"
-                    style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
                   >
                     {vertex.label}
                   </text>
@@ -426,19 +408,18 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                       y="-12"
                       width="54"
                       height="14"
-                      rx="7"
-                      fill="#0F172A"
-                      stroke="#334155"
+                      rx="6"
+                      fill="#18181B"
+                      stroke="#27272A"
                       strokeWidth="0.8"
-                      opacity="0.95"
                     />
                     <text
                       x="0"
                       y="-2.5"
                       textAnchor="middle"
-                      fill="#94A3B8"
+                      fill="#A1A1AA"
                       fontSize="8.5"
-                      fontWeight="700"
+                      fontWeight="600"
                       className="font-mono"
                     >
                       g={vertex.degree} ({vertex.x},{vertex.y})
@@ -450,30 +431,29 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
           </g>
         </svg>
 
-        {/* Empty state hint */}
         {vertices.length === 0 && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-slate-500">
-            <PlusCircle className="w-8 h-8 mb-2 opacity-40 text-emerald-400" />
-            <p className="text-sm font-semibold text-slate-300">Lienzo vacío</p>
-            <p className="text-xs text-slate-500">
-              Selecciona <span className="text-emerald-400 font-bold">+ Nodo</span> arriba y toca para dibujar
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-zinc-500">
+            <PlusCircle className="w-8 h-8 mb-2 opacity-30 text-zinc-400" />
+            <p className="text-sm font-semibold text-zinc-300">Lienzo vacío</p>
+            <p className="text-xs text-zinc-500">
+              Selecciona <span className="text-zinc-200 font-bold">+ Nodo</span> arriba y toca para dibujar
             </p>
           </div>
         )}
       </div>
 
-      {/* Bottom Sub-bar: Vertex / Edge stats */}
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-900 border-t border-slate-800 text-[11px] text-slate-400">
+      {/* Bottom Sub-bar */}
+      <div className="flex items-center justify-between px-3 py-2 bg-zinc-900 border-t border-zinc-800 text-[11px] text-zinc-400">
         <div className="flex items-center gap-3">
           <span>
-            Vértices: <strong className="text-slate-100 font-mono text-xs">{vertices.length}</strong>
+            Vértices: <strong className="text-zinc-100 font-mono text-xs">{vertices.length}</strong>
           </span>
           <span>
-            Aristas: <strong className="text-slate-100 font-mono text-xs">{edges.length}</strong>
+            Aristas: <strong className="text-zinc-100 font-mono text-xs">{edges.length}</strong>
           </span>
         </div>
-        <div className="text-slate-500 text-[10px]">
-          Arrastra para mover • Plano ({viewBoxWidth}x{viewBoxHeight})
+        <div className="text-zinc-500 text-[10px]">
+          Arrastra para mover • Coordenadas ({viewBoxWidth}x{viewBoxHeight})
         </div>
       </div>
     </div>

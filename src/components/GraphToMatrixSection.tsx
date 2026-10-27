@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import type { Vertex, CanvasTool } from '../types/graph';
+import type { Vertex, CanvasTool, PredefinedGraph } from '../types/graph';
+import { PREDEFINED_GRAPHS } from '../utils/examples';
 import { GraphCanvas } from './GraphCanvas';
 import { matrixToString } from '../utils/graphAlgorithms';
 import {
-  Paintbrush,
   Copy,
   Check,
   Grid3X3,
   ArrowDown,
+  Sparkles,
 } from 'lucide-react';
 
 interface GraphToMatrixSectionProps {
@@ -22,6 +23,7 @@ interface GraphToMatrixSectionProps {
   onDeleteVertex: (id: number) => void;
   onApplyLayout: (type: 'circular' | 'grid' | 'random') => void;
   onOpenSaveModal: () => void;
+  onSelectExample: (graph: PredefinedGraph) => void;
 }
 
 export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
@@ -35,6 +37,7 @@ export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
   onToggleEdge,
   onDeleteVertex,
   onApplyLayout,
+  onSelectExample,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -52,25 +55,37 @@ export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Step 1: Visual Canvas Header */}
-      <div className="p-4 bg-gradient-to-r from-purple-950/70 via-slate-900 to-slate-900 rounded-3xl border border-purple-500/30 shadow-xl flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-purple-600/20 border border-purple-500/40 text-purple-400 flex items-center justify-center shrink-0">
-            <Paintbrush className="w-5 h-5" />
-          </div>
+      {/* Step 1: Visual Canvas Header (Minimalist) */}
+      <div className="p-4 bg-zinc-900 rounded-2xl border border-zinc-800 shadow-sm flex flex-col gap-3">
+        <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-300 px-2 py-0.5 bg-purple-500/10 rounded-md border border-purple-500/20">
-                Paso 1: Dibuja tu Grafo
-              </span>
-            </div>
-            <h2 className="text-sm font-bold text-white mt-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-2 py-0.5 bg-zinc-800 rounded border border-zinc-700">
+              Paso 1: Dibuja tu Grafo
+            </span>
+            <h2 className="text-sm font-bold text-zinc-100 mt-1.5">
               Estudio Visual: De Grafo a Matriz de Adyacencia
             </h2>
-            <p className="text-[11px] text-slate-400">
-              Toca para añadir nodos, conecta aristas o arrastra. La matriz y los grados se calculan al instante.
+            <p className="text-[11px] text-zinc-400">
+              Toca para añadir nodos, conecta aristas o arrastra. La matriz se construye en tiempo real debajo.
             </p>
           </div>
+        </div>
+
+        {/* Quick Pre-created Graphs Bar (Direct 1-touch selector) */}
+        <div className="pt-2 border-t border-zinc-800 flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <span className="text-[10px] font-semibold text-zinc-400 shrink-0 mr-1 flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-zinc-400" />
+            <span>Grafos Pre-creados:</span>
+          </span>
+          {PREDEFINED_GRAPHS.map((ex) => (
+            <button
+              key={ex.id}
+              onClick={() => onSelectExample(ex)}
+              className="text-[10px] font-medium px-2.5 py-1 bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-200 rounded-lg border border-zinc-700 shrink-0 transition"
+            >
+              {ex.name.split(' (')[0]}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -88,25 +103,25 @@ export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
       />
 
       {/* Transition indicator */}
-      <div className="flex items-center justify-center gap-2 py-1 text-xs font-semibold text-purple-400">
-        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-purple-950/80 rounded-full border border-purple-500/40 shadow-md">
-          <ArrowDown className="w-3.5 h-3.5 animate-bounce" />
+      <div className="flex items-center justify-center gap-2 py-1 text-xs font-semibold text-zinc-400">
+        <div className="h-[1px] flex-1 bg-zinc-800" />
+        <div className="flex items-center gap-1.5 px-3 py-1 bg-zinc-900 rounded-full border border-zinc-700 shadow-sm text-zinc-300">
+          <ArrowDown className="w-3.5 h-3.5 text-zinc-400" />
           <span>Matriz de Adyacencia Viva (Generada)</span>
         </div>
-        <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-purple-500/30 to-transparent" />
+        <div className="h-[1px] flex-1 bg-zinc-800" />
       </div>
 
       {/* Step 2: The Generated Live Mirror Matrix */}
-      <div className="bg-slate-900/90 rounded-3xl border border-slate-800 p-4 space-y-3 shadow-xl">
+      <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-4 space-y-3 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Grid3X3 className="w-4 h-4 text-purple-400" />
+            <Grid3X3 className="w-4 h-4 text-zinc-400" />
             <div>
-              <h3 className="text-sm font-bold text-white">
+              <h3 className="text-sm font-bold text-zinc-100">
                 Matriz de Adyacencia Calculada
               </h3>
-              <p className="text-[10px] text-slate-400">
+              <p className="text-[10px] text-zinc-400">
                 Sincronizada automáticamente con cada nodo y arista del lienzo
               </p>
             </div>
@@ -114,7 +129,7 @@ export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
 
           <button
             onClick={handleCopyMatrix}
-            className="flex items-center gap-1 text-xs px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-slate-200 active:scale-95 rounded-xl border border-slate-700 transition"
+            className="flex items-center gap-1 text-xs px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 active:scale-95 rounded-lg border border-zinc-700 transition"
           >
             {copied ? (
               <>
@@ -123,32 +138,32 @@ export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-[11px]">Copiar Matriz</span>
+                <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                <span className="text-[11px]">Copiar</span>
               </>
             )}
           </button>
         </div>
 
-        {/* Real-time Graph Metrics */}
-        <div className="grid grid-cols-3 gap-2 p-3 bg-slate-950/80 rounded-2xl border border-slate-800/80 text-center">
+        {/* Real-time Graph Metrics (Minimalist) */}
+        <div className="grid grid-cols-3 gap-2 p-3 bg-zinc-950 rounded-xl border border-zinc-800 text-center">
           <div>
-            <div className="text-[10px] text-slate-400">Vértices |V|</div>
-            <div className="text-sm font-bold text-slate-100 font-mono">{n}</div>
+            <div className="text-[10px] text-zinc-400">Vértices |V|</div>
+            <div className="text-sm font-bold text-zinc-100 font-mono">{n}</div>
           </div>
           <div>
-            <div className="text-[10px] text-slate-400">Aristas |E|</div>
-            <div className="text-sm font-bold text-slate-100 font-mono">{edgeCount}</div>
+            <div className="text-[10px] text-zinc-400">Aristas |E|</div>
+            <div className="text-sm font-bold text-zinc-100 font-mono">{edgeCount}</div>
           </div>
           <div>
-            <div className="text-[10px] text-slate-400">Densidad</div>
-            <div className="text-sm font-bold text-indigo-400 font-mono">{density}%</div>
+            <div className="text-[10px] text-zinc-400">Densidad</div>
+            <div className="text-sm font-bold text-zinc-100 font-mono">{density}%</div>
           </div>
         </div>
 
         {/* Matrix Grid Table */}
         {n === 0 ? (
-          <div className="py-6 text-center text-slate-500 text-xs">
+          <div className="py-6 text-center text-zinc-500 text-xs">
             Dibuja al menos un vértice arriba para generar la matriz.
           </div>
         ) : (
@@ -156,12 +171,11 @@ export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
             <table className="border-collapse mx-auto">
               <thead>
                 <tr>
-                  <th className="p-1 text-[11px] text-slate-500 font-mono"></th>
+                  <th className="p-1 text-[11px] text-zinc-500 font-mono"></th>
                   {vertices.map((v) => (
                     <th
                       key={`th-live-${v.id}`}
-                      className="p-1 text-[11px] font-bold text-center min-w-[34px]"
-                      style={{ color: v.colorHex || '#94A3B8' }}
+                      className="p-1 text-[11px] font-bold text-center min-w-[34px] text-zinc-300"
                     >
                       {v.label}
                     </th>
@@ -172,8 +186,7 @@ export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
                 {vertices.map((rowV, r) => (
                   <tr key={`tr-live-${rowV.id}`}>
                     <td
-                      className="p-1 text-[11px] font-bold text-right pr-2 min-w-[34px]"
-                      style={{ color: rowV.colorHex || '#94A3B8' }}
+                      className="p-1 text-[11px] font-bold text-right pr-2 min-w-[34px] text-zinc-400"
                     >
                       {rowV.label}
                     </td>
@@ -188,10 +201,10 @@ export const GraphToMatrixSection: React.FC<GraphToMatrixSectionProps> = ({
                             onClick={() => onToggleEdge(r, c)}
                             className={`w-8 h-8 rounded-lg font-mono text-xs font-bold transition-all ${
                               isDiagonal
-                                ? 'bg-slate-950/60 text-slate-700 cursor-not-allowed opacity-30'
+                                ? 'bg-zinc-950 text-zinc-700 cursor-not-allowed opacity-20'
                                 : isConnected
-                                ? 'bg-purple-600 text-white shadow-md shadow-purple-500/25'
-                                : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                                ? 'bg-zinc-100 text-zinc-950 font-bold shadow-sm'
+                                : 'bg-zinc-800 text-zinc-400 hover:text-zinc-200'
                             }`}
                           >
                             {matrix[r]?.[c] ?? 0}

@@ -37,7 +37,7 @@ export const SaveGraphModal: React.FC<SaveGraphModalProps> = ({
         particleCount: 30,
         spread: 50,
         origin: { y: 0.3 },
-        colors: ['#3B82F6', '#10B981', '#8B5CF6'],
+        colors: ['#3B82F6', '#10B981'],
       });
     } catch {}
 
@@ -54,62 +54,60 @@ export const SaveGraphModal: React.FC<SaveGraphModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-slate-900 border-t sm:border border-slate-700/80 rounded-t-[32px] sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-in slide-in-from-bottom-6 duration-250"
+        className="bg-zinc-900 border-t sm:border border-zinc-700 rounded-t-3xl sm:rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-in slide-in-from-bottom-8 duration-200"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+        }}
       >
-        {/* Visual Drag Handle for Mobile */}
-        <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
+        <div className="w-12 h-1 bg-zinc-700 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
 
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-blue-500/20 text-blue-400 rounded-xl border border-blue-500/30">
-              <BookmarkPlus className="w-5 h-5" />
+            <div className="p-1.5 bg-zinc-800 text-zinc-200 rounded-lg border border-zinc-700">
+              <BookmarkPlus className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white">Guardar Grafo Actual</h3>
-              <p className="text-[11px] text-slate-400">
-                Almacena tu grafo en tu dispositivo con un nombre personalizado
+              <h3 className="text-sm font-bold text-zinc-100">Guardar Grafo Actual</h3>
+              <p className="text-[11px] text-zinc-400">
+                Almacena el grafo en tu dispositivo con un nombre personalizado
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center text-slate-300 hover:text-white rounded-xl bg-slate-800 active:scale-95 border border-slate-700 transition"
+            className="w-9 h-9 flex items-center justify-center text-zinc-300 hover:text-white rounded-lg bg-zinc-800 active:scale-95 border border-zinc-700 transition"
             aria-label="Cerrar modal"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSave} className="p-5 space-y-4 pb-8 sm:pb-5">
-          {/* Quick Stats Pill */}
-          <div className="flex items-center justify-between p-3 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs">
+        <form onSubmit={handleSave} className="p-5 space-y-4">
+          <div className="flex items-center justify-between p-3 bg-zinc-950 rounded-xl border border-zinc-800 text-xs">
             <div className="flex items-center gap-2">
-              <span className="text-slate-400">Vértices:</span>
-              <span className="font-bold text-white font-mono">{vertices.length}</span>
+              <span className="text-zinc-400">Vértices:</span>
+              <span className="font-bold text-zinc-100 font-mono">{vertices.length}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-slate-400">Aristas:</span>
-              <span className="font-bold text-white font-mono">
+              <span className="text-zinc-400">Aristas:</span>
+              <span className="font-bold text-zinc-100 font-mono">
                 {matrix.reduce((acc, row) => acc + row.reduce((a, b) => a + b, 0), 0) / 2}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-indigo-400 font-semibold">χ(G):</span>
-              <span className="font-bold text-white font-mono">{chromaticNumber}</span>
+              <span className="text-zinc-400">χ(G):</span>
+              <span className="font-bold text-zinc-100 font-mono">{chromaticNumber}</span>
             </div>
           </div>
 
-          {/* Name Field */}
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-200">
-              Nombre del Grafo <span className="text-rose-400">*</span>
+            <label className="text-xs font-bold text-zinc-200">
+              Nombre del Grafo <span className="text-red-400">*</span>
             </label>
             <input
               type="text"
@@ -118,13 +116,12 @@ export const SaveGraphModal: React.FC<SaveGraphModalProps> = ({
               value={graphName}
               onChange={(e) => setGraphName(e.target.value)}
               placeholder="Ej. Taller 1 - Ejercicio 4, Red Bipartita..."
-              className="w-full bg-slate-950 text-slate-100 text-xs px-3.5 py-3 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 transition placeholder:text-slate-600"
+              className="w-full bg-zinc-950 text-zinc-100 text-xs px-3.5 py-3 rounded-xl border border-zinc-800 focus:outline-none focus:border-zinc-500 transition placeholder:text-zinc-600"
             />
           </div>
 
-          {/* Description / Notes Field */}
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300">
+            <label className="text-xs font-medium text-zinc-300">
               Descripción o Notas (Opcional)
             </label>
             <textarea
@@ -132,32 +129,31 @@ export const SaveGraphModal: React.FC<SaveGraphModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Ej. Grafo 3-regular no planar para verificar conjetura..."
-              className="w-full bg-slate-950 text-slate-100 text-xs px-3.5 py-2.5 rounded-xl border border-slate-800 focus:outline-none focus:border-blue-500 transition placeholder:text-slate-600 resize-none"
+              className="w-full bg-zinc-950 text-zinc-100 text-xs px-3.5 py-2.5 rounded-xl border border-zinc-800 focus:outline-none focus:border-zinc-500 transition placeholder:text-zinc-600 resize-none"
             />
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center gap-2 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-750 active:scale-95 text-slate-300 text-xs font-semibold rounded-xl transition"
+              className="flex-1 py-3 px-4 bg-zinc-800 hover:bg-zinc-700 active:scale-95 text-zinc-300 text-xs font-semibold rounded-xl border border-zinc-700 transition"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={saved}
-              className="flex-1 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-95 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2"
+              className="flex-1 py-3 px-4 bg-zinc-100 hover:bg-white active:scale-95 text-zinc-950 text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center gap-2"
             >
               {saved ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-400" />
-                  <span>¡Guardado con Éxito!</span>
+                  <Check className="w-4 h-4 text-emerald-600" />
+                  <span>¡Guardado!</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <Sparkles className="w-4 h-4 text-zinc-800" />
                   <span>Guardar Grafo</span>
                 </>
               )}

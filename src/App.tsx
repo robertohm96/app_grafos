@@ -41,7 +41,6 @@ export function App() {
   const [savedCount, setSavedCount] = useState(0);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Load saved count on mount
   useEffect(() => {
     setSavedCount(getSavedGraphs().length);
   }, []);
@@ -51,12 +50,10 @@ export function App() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  // Compute Welsh-Powell coloring reactively
   const coloringResult = useMemo(() => {
     return runWelshPowell(vertices, matrix);
   }, [vertices.length, matrix]);
 
-  // Enrich vertices with their assigned Welsh-Powell color and degrees
   const enrichedVertices = useMemo(() => {
     return vertices.map((v, idx) => {
       const deg = matrix[idx] ? matrix[idx].reduce((a, b) => a + b, 0) : 0;
@@ -75,22 +72,20 @@ export function App() {
   const triggerConfetti = useCallback(() => {
     try {
       confetti({
-        particleCount: 40,
-        spread: 60,
+        particleCount: 35,
+        spread: 50,
         origin: { y: 0.2 },
-        colors: ['#3B82F6', '#EC4899', '#10B981', '#F59E0B', '#8B5CF6'],
+        colors: ['#2563EB', '#059669', '#D97706', '#7C3AED'],
       });
     } catch {}
   }, []);
 
-  // Update position of a vertex
   const handleUpdateVertexPos = useCallback((id: number, x: number, y: number) => {
     setVertices((prev) =>
       prev.map((v) => (v.id === id ? { ...v, x, y } : v))
     );
   }, []);
 
-  // Add vertex at coordinates (X, Y)
   const handleAddVertexAt = useCallback((x: number, y: number) => {
     setVertices((prev) => {
       const nextId = prev.length > 0 ? Math.max(...prev.map((v) => v.id)) + 1 : 1;
@@ -112,7 +107,6 @@ export function App() {
     });
   }, []);
 
-  // Toggle edge between two vertices
   const handleToggleEdge = useCallback((uIdx: number, vIdx: number) => {
     if (uIdx === vIdx) return;
     setMatrix((prev) => {
@@ -125,7 +119,6 @@ export function App() {
     });
   }, []);
 
-  // Delete a vertex by its ID
   const handleDeleteVertex = useCallback((id: number) => {
     const idx = vertices.findIndex((v) => v.id === id);
     if (idx === -1) return;
@@ -139,7 +132,6 @@ export function App() {
     });
   }, [vertices]);
 
-  // Set new matrix
   const handleSetMatrix = useCallback((newMatrix: number[][]) => {
     const newN = newMatrix.length;
     setMatrix(newMatrix);
@@ -159,7 +151,6 @@ export function App() {
     });
   }, []);
 
-  // Add vertex from Matrix Tab (+ Fila/Columna)
   const handleAddVertexSimple = useCallback(() => {
     const nextId = vertices.length > 0 ? Math.max(...vertices.map((v) => v.id)) + 1 : 1;
     const defaultCoords = generateCircularCoords(vertices.length + 1, 380, 300);
@@ -184,14 +175,12 @@ export function App() {
     });
   }, [vertices]);
 
-  // Remove last vertex
   const handleRemoveLastVertex = useCallback(() => {
     if (vertices.length <= 1) return;
     const lastId = vertices[vertices.length - 1].id;
     handleDeleteVertex(lastId);
   }, [vertices, handleDeleteVertex]);
 
-  // Apply auto-layout
   const handleApplyLayout = useCallback((type: 'circular' | 'grid' | 'random') => {
     const count = vertices.length;
     if (count === 0) return;
@@ -214,7 +203,6 @@ export function App() {
     );
   }, [vertices.length]);
 
-  // Load predefined example
   const handleSelectExample = useCallback((graph: PredefinedGraph) => {
     const n = graph.matrix.length;
     setMatrix(graph.matrix);
@@ -234,10 +222,9 @@ export function App() {
 
     setVertices(newVertices);
     triggerConfetti();
-    showToast(`Ejemplo cargado: ${graph.name}`);
+    showToast(`Cargado: ${graph.name}`);
   }, [triggerConfetti]);
 
-  // Load generated graph from Havel-Hakimi
   const handleLoadGeneratedGraph = useCallback((newMatrix: number[][], count: number) => {
     setMatrix(newMatrix);
     const coords = generateCircularCoords(count, 380, 300);
@@ -251,10 +238,9 @@ export function App() {
     setVertices(newVertices);
     triggerConfetti();
     setActiveMode('graphToMatrix');
-    showToast('¡Grafo de Havel-Hakimi generado en el estudio!');
+    showToast('¡Grafo generado con éxito!');
   }, [triggerConfetti]);
 
-  // Load saved graph from storage
   const handleLoadSavedGraph = useCallback((newVertices: Vertex[], newMatrix: number[][], name: string) => {
     setVertices(newVertices);
     setMatrix(newMatrix);
@@ -263,19 +249,18 @@ export function App() {
     showToast(`Grafo cargado: "${name}"`);
   }, [triggerConfetti]);
 
-  // Reset to empty
   const handleReset = useCallback(() => {
     if (vertices.length === 0) return;
     if (window.confirm('¿Deseas reiniciar y crear un grafo en blanco?')) {
       setVertices([]);
       setMatrix([]);
-      showToast('Lienzo en blanco listo para comenzar');
+      showToast('Lienzo en blanco listo');
     }
   }, [vertices.length]);
 
   return (
-    <div className="min-h-screen bg-[#070A10] text-slate-100 flex flex-col font-sans selection:bg-blue-600/30">
-      {/* Top Mobile Header with Safe Area Inset */}
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans selection:bg-zinc-800">
+      {/* Top Mobile Header */}
       <Header
         chromaticNumber={coloringResult.chromaticNumber}
         onSelectExample={handleSelectExample}
@@ -288,15 +273,15 @@ export function App() {
         {/* Toast Notification Pill */}
         {toastMessage && (
           <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-4 duration-200">
-            <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/95 border border-blue-500/50 text-blue-200 text-xs font-semibold rounded-full shadow-2xl backdrop-blur-xl">
+            <div className="flex items-center gap-2 px-4 py-2 bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs font-semibold rounded-full shadow-lg backdrop-blur-md">
               <Check className="w-4 h-4 text-emerald-400" />
               <span>{toastMessage}</span>
             </div>
           </div>
         )}
 
-        {/* 5-Mode Navigation Bar (Fable Studio Nav) */}
-        <section aria-label="Navegación de Modos de la Aplicación">
+        {/* 5-Mode Navigation Bar */}
+        <section aria-label="Navegación de Modos">
           <TabNavigation
             activeMode={activeMode}
             onChangeMode={setActiveMode}
@@ -324,6 +309,7 @@ export function App() {
               onSetMatrix={handleSetMatrix}
               onAddVertexSimple={handleAddVertexSimple}
               onRemoveLastVertex={handleRemoveLastVertex}
+              onSelectExample={handleSelectExample}
             />
           )}
 
@@ -341,6 +327,7 @@ export function App() {
               onDeleteVertex={handleDeleteVertex}
               onApplyLayout={handleApplyLayout}
               onOpenSaveModal={() => setIsSaveModalOpen(true)}
+              onSelectExample={handleSelectExample}
             />
           )}
 
@@ -387,7 +374,7 @@ export function App() {
         chromaticNumber={coloringResult.chromaticNumber}
         onSavedSuccess={(name) => {
           setSavedCount(getSavedGraphs().length);
-          showToast(`¡Grafo "${name}" guardado en tu dispositivo!`);
+          showToast(`¡Grafo "${name}" guardado!`);
         }}
       />
     </div>
