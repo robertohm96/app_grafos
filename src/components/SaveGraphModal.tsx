@@ -53,10 +53,19 @@ export const SaveGraphModal: React.FC<SaveGraphModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div
+        className="bg-slate-900 border-t sm:border border-slate-700/80 rounded-t-[32px] sm:rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col animate-in slide-in-from-bottom-6 duration-250"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Visual Drag Handle for Mobile */}
+        <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
+
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-800">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
           <div className="flex items-center gap-2">
             <div className="p-2 bg-blue-500/20 text-blue-400 rounded-xl border border-blue-500/30">
               <BookmarkPlus className="w-5 h-5" />
@@ -70,14 +79,15 @@ export const SaveGraphModal: React.FC<SaveGraphModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white rounded-lg bg-slate-800 active:scale-95 transition"
+            className="w-9 h-9 flex items-center justify-center text-slate-300 hover:text-white rounded-xl bg-slate-800 active:scale-95 border border-slate-700 transition"
+            aria-label="Cerrar modal"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSave} className="p-5 space-y-4">
+        <form onSubmit={handleSave} className="p-5 space-y-4 pb-8 sm:pb-5">
           {/* Quick Stats Pill */}
           <div className="flex items-center justify-between p-3 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs">
             <div className="flex items-center gap-2">

@@ -9,6 +9,7 @@ import {
   HelpCircle,
   BookmarkPlus,
   X,
+  ArrowDownCircle,
 } from 'lucide-react';
 
 interface HeaderProps {
@@ -115,26 +116,45 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Predefined Examples Modal */}
+      {/* Predefined Examples Modal: Native Mobile Bottom Sheet / Modal with VISIBLE Scrollbar */}
       {showExamplesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-slate-800">
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setShowExamplesModal(false)}
+        >
+          <div
+            className="bg-slate-900 border-t sm:border border-slate-700/80 rounded-t-[32px] sm:rounded-3xl w-full max-w-lg max-h-[82vh] sm:max-h-[85vh] overflow-hidden shadow-2xl flex flex-col animate-in slide-in-from-bottom-6 duration-250"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Visual Drag Handle for Mobile */}
+            <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
+
+            {/* Modal Header (ALWAYS Visible, never cut off) */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 shrink-0">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-400" />
-                <h3 className="text-sm font-bold text-white">
-                  Ejemplos Predefinidos de Teoría de Grafos
-                </h3>
+                <div className="p-1.5 bg-amber-500/20 text-amber-400 rounded-xl border border-amber-500/30">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white leading-tight">
+                    Ejemplos Predefinidos
+                  </h3>
+                  <p className="text-[10px] text-slate-400">
+                    Toca cualquiera para cargarlo en el estudio
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setShowExamplesModal(false)}
-                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white rounded-lg bg-slate-800 active:scale-95"
+                className="w-9 h-9 flex items-center justify-center text-slate-300 hover:text-white rounded-xl bg-slate-800 active:scale-95 border border-slate-700 transition"
+                aria-label="Cerrar modal"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 overflow-y-auto space-y-2.5">
+            {/* Scrollable List with VISIBLE High-Contrast Scrollbar (Barrita lateral visible) */}
+            <div className="p-4 custom-scroll space-y-2.5 flex-1 pr-3 pb-8 sm:pb-4">
               {PREDEFINED_GRAPHS.map((ex) => (
                 <button
                   key={ex.id}
@@ -142,61 +162,93 @@ export const Header: React.FC<HeaderProps> = ({
                     onSelectExample(ex);
                     setShowExamplesModal(false);
                   }}
-                  className="w-full text-left p-3.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 active:scale-[0.99] border border-slate-800 hover:border-blue-500/50 transition group flex flex-col gap-1.5"
+                  className="w-full text-left p-3.5 rounded-2xl bg-slate-950/80 hover:bg-slate-800 active:scale-[0.98] border border-slate-800 hover:border-blue-500/60 transition group flex flex-col gap-1.5 shadow-sm"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-100 group-hover:text-blue-400 transition">
                       {ex.name}
                     </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono font-semibold">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-blue-300 font-mono font-bold border border-slate-700">
                       {ex.matrix.length} vértices
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 leading-snug">
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
                     {ex.description}
                   </p>
                 </button>
               ))}
             </div>
+
+            {/* Bottom Hint Banner */}
+            <div className="px-4 py-2 bg-slate-950/90 border-t border-slate-800 text-[10px] text-slate-400 flex items-center justify-between shrink-0">
+              <span className="flex items-center gap-1 text-slate-400">
+                <ArrowDownCircle className="w-3.5 h-3.5 text-blue-400" />
+                Usa la barrita azul lateral para ver todos los grafos
+              </span>
+              <button
+                onClick={() => setShowExamplesModal(false)}
+                className="text-blue-400 font-bold hover:underline"
+              >
+                Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Info / Graph Theory Guide Modal */}
+      {/* Info / Graph Theory Guide Modal: Native Mobile Bottom Sheet / Modal with VISIBLE Scrollbar */}
       {showInfoModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg max-h-[85vh] overflow-hidden shadow-2xl flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b border-slate-800">
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setShowInfoModal(false)}
+        >
+          <div
+            className="bg-slate-900 border-t sm:border border-slate-700/80 rounded-t-[32px] sm:rounded-3xl w-full max-w-lg max-h-[82vh] sm:max-h-[85vh] overflow-hidden shadow-2xl flex flex-col animate-in slide-in-from-bottom-6 duration-250"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Visual Drag Handle for Mobile */}
+            <div className="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
+
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800 shrink-0">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-blue-400" />
-                <h3 className="text-sm font-bold text-white">
-                  Guía Teórica: Coloración de Grafos
-                </h3>
+                <div className="p-1.5 bg-blue-500/20 text-blue-400 rounded-xl border border-blue-500/30">
+                  <BookOpen className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white leading-tight">
+                    Guía Teórica: Coloración de Grafos
+                  </h3>
+                  <p className="text-[10px] text-slate-400">
+                    Conceptos clave y algoritmos implementados
+                  </p>
+                </div>
               </div>
               <button
                 onClick={() => setShowInfoModal(false)}
-                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-white rounded-lg bg-slate-800 active:scale-95"
+                className="w-9 h-9 flex items-center justify-center text-slate-300 hover:text-white rounded-xl bg-slate-800 active:scale-95 border border-slate-700 transition"
+                aria-label="Cerrar modal"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 overflow-y-auto space-y-3 text-xs text-slate-300 leading-relaxed">
-              <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800 space-y-1">
+            {/* Scrollable Guide with VISIBLE Scrollbar */}
+            <div className="p-4 custom-scroll space-y-3 text-xs text-slate-300 leading-relaxed flex-1 pr-3 pb-8 sm:pb-4">
+              <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-1">
                 <h4 className="font-bold text-white text-xs">¿Qué es una Coloración Propia?</h4>
                 <p className="text-slate-400 text-[11px]">
                   Es una asignación de colores a los vértices de un grafo tal que ningún par de vértices adyacentes (conectados por una arista) comparta el mismo color.
                 </p>
               </div>
 
-              <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800 space-y-1">
+              <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-1">
                 <h4 className="font-bold text-white text-xs">Número Cromático $\chi(G)$</h4>
                 <p className="text-slate-400 text-[11px]">
                   Es el número mínimo de colores necesarios para colorear adecuadamente el grafo $G$.
                 </p>
               </div>
 
-              <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800 space-y-1">
+              <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-1">
                 <h4 className="font-bold text-white text-xs">Algoritmo de Welsh-Powell</h4>
                 <ol className="list-decimal list-inside text-slate-400 text-[11px] space-y-1">
                   <li>Calcula el grado $g(v)$ de cada vértice.</li>
@@ -207,12 +259,25 @@ export const Header: React.FC<HeaderProps> = ({
                 </ol>
               </div>
 
-              <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-800 space-y-1">
+              <div className="p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800 space-y-1">
                 <h4 className="font-bold text-white text-xs">Teorema de Havel-Hakimi</h4>
                 <p className="text-slate-400 text-[11px]">
                   Permite determinar si una secuencia finita de números enteros no negativos es la secuencia de grados de un grafo simple finito, y genera la construcción paso a paso.
                 </p>
               </div>
+            </div>
+
+            <div className="px-4 py-2 bg-slate-950/90 border-t border-slate-800 text-[10px] text-slate-400 flex items-center justify-between shrink-0">
+              <span className="flex items-center gap-1 text-slate-400">
+                <ArrowDownCircle className="w-3.5 h-3.5 text-blue-400" />
+                Usa la barrita azul para navegar por la guía
+              </span>
+              <button
+                onClick={() => setShowInfoModal(false)}
+                className="text-blue-400 font-bold hover:underline"
+              >
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
