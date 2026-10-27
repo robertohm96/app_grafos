@@ -1,0 +1,62 @@
+name: Compilar APK Android (GraphColor Pro)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # Permite ejecutar la compilación manualmente con un clic desde GitHub Actions
+
+jobs:
+  build-android:
+    name: Compilar APK en la Nube
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: ☕ Configurar Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: 📱 Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 📦 Instalar dependencias de Node
+        run: npm install
+
+      - name: 🏗️ Compilar frontend web (Vite + React + Tailwind)
+        run: npm run build
+
+      - name: 🔌 Inicializar plataforma Android con Capacitor
+        run: |
+          if [ ! -d "android" ]; then
+            npx cap add android
+          fi
+          npx cap sync android
+
+      - name: 🔨 Permisos para Gradle wrapper
+        run: |
+          cd android
+          chmod +x gradlew
+
+      - name: 🚀 Compilar APK Android (Debug)
+        run: |
+          cd android
+          ./gradlew assembleDebug --stacktrace
+
+      - name: 📤 Subir APK a Descargas de GitHub (Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: GraphColor-Pro-v2-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14

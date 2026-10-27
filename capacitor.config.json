@@ -1,0 +1,8 @@
+{
+  "appId": "com.graphcolor.calculator",
+  "appName": "GraphColor Pro",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
