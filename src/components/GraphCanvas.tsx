@@ -8,7 +8,6 @@ import {
   CircleDot,
   Grid,
   Shuffle,
-  Info,
 } from 'lucide-react';
 
 interface GraphCanvasProps {
@@ -78,7 +77,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
       const { x, y } = getSvgCoordinates(e);
       onAddVertex(x, y);
     } else if (activeTool === 'connect') {
-      // Deselect if clicking on empty space
       setConnectSourceIdx(null);
     }
   };
@@ -94,13 +92,10 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
       (e.target as Element).setPointerCapture?.(e.pointerId);
     } else if (activeTool === 'connect') {
       if (connectSourceIdx === null) {
-        // Select first node
         setConnectSourceIdx(index);
       } else if (connectSourceIdx === index) {
-        // Deselect itself
         setConnectSourceIdx(null);
       } else {
-        // Connect/disconnect
         onToggleEdge(connectSourceIdx, index);
         setConnectSourceIdx(null);
       }
@@ -145,124 +140,134 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
   }
 
   return (
-    <div className="relative flex flex-col w-full bg-slate-950/80 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-md">
-      {/* Top Floating Control Bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-900/90 border-b border-slate-800/80 gap-2">
-        {/* Tool selector */}
-        <div className="flex items-center bg-slate-950/90 p-1 rounded-xl border border-slate-800/80">
+    <div className="relative flex flex-col w-full bg-slate-950/90 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden backdrop-blur-md">
+      {/* Primary Tool Selector: Generous 4-segment full width bar for mobile fingers */}
+      <div className="p-2 bg-slate-900 border-b border-slate-800">
+        <div className="grid grid-cols-4 gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800/80">
+          {/* Mover */}
           <button
             onClick={() => {
               setActiveTool('move');
               setConnectSourceIdx(null);
             }}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg font-bold text-xs transition-all active:scale-95 min-h-[46px] ${
               activeTool === 'move'
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30 ring-1 ring-blue-400'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
             }`}
-            title="Mover o arrastrar nodos"
           >
-            <Move className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Mover</span>
+            <Move className="w-4 h-4 shrink-0" />
+            <span className="text-[11px] leading-tight font-semibold">Mover</span>
           </button>
 
+          {/* + Nodo */}
           <button
             onClick={() => {
               setActiveTool('add');
               setConnectSourceIdx(null);
             }}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg font-bold text-xs transition-all active:scale-95 min-h-[46px] ${
               activeTool === 'add'
-                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/25'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/30 ring-1 ring-emerald-400'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
             }`}
-            title="Tocar lienzo para agregar nodo"
           >
-            <PlusCircle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">+ Nodo</span>
+            <PlusCircle className="w-4 h-4 shrink-0" />
+            <span className="text-[11px] leading-tight font-semibold">+ Nodo</span>
           </button>
 
+          {/* Conectar */}
           <button
             onClick={() => {
               setActiveTool('connect');
             }}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg font-bold text-xs transition-all active:scale-95 min-h-[46px] ${
               activeTool === 'connect'
-                ? 'bg-purple-600 text-white shadow-md shadow-purple-500/25'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30 ring-1 ring-purple-400'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
             }`}
-            title="Tocar dos nodos para conectar o desconectar"
           >
-            <Link2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Conectar</span>
+            <Link2 className="w-4 h-4 shrink-0" />
+            <span className="text-[11px] leading-tight font-semibold">Conectar</span>
           </button>
 
+          {/* Borrar */}
           <button
             onClick={() => {
               setActiveTool('delete');
               setConnectSourceIdx(null);
             }}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-lg font-bold text-xs transition-all active:scale-95 min-h-[46px] ${
               activeTool === 'delete'
-                ? 'bg-rose-600 text-white shadow-md shadow-rose-500/25'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-rose-600 text-white shadow-lg shadow-rose-500/30 ring-1 ring-rose-400'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
             }`}
-            title="Tocar nodo para eliminarlo"
           >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Borrar</span>
-          </button>
-        </div>
-
-        {/* Layout quick action buttons */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => onApplyLayout('circular')}
-            className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-slate-800/80 rounded-lg transition-colors"
-            title="Acomodo Circular"
-          >
-            <CircleDot className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => onApplyLayout('grid')}
-            className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-slate-800/80 rounded-lg transition-colors"
-            title="Acomodo en Cuadrícula"
-          >
-            <Grid className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => onApplyLayout('random')}
-            className="p-1.5 text-slate-400 hover:text-cyan-400 hover:bg-slate-800/80 rounded-lg transition-colors"
-            title="Acomodo Aleatorio"
-          >
-            <Shuffle className="w-4 h-4" />
+            <Trash2 className="w-4 h-4 shrink-0" />
+            <span className="text-[11px] leading-tight font-semibold">Borrar</span>
           </button>
         </div>
       </div>
 
-      {/* Helpful Mode Notification Pill */}
-      {activeTool === 'connect' && (
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-          <div className="bg-purple-950/90 border border-purple-500/50 text-purple-200 text-xs px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 backdrop-blur-sm animate-pulse">
-            <Info className="w-3 h-3 text-purple-400" />
-            {connectSourceIdx === null
-              ? 'Toca el primer vértice'
-              : `Toca otro vértice para unirlo con ${vertices[connectSourceIdx]?.label}`}
-          </div>
+      {/* Sub-bar: Instructions & Layout quick buttons with comfortable touch size */}
+      <div className="flex items-center justify-between px-3 py-2 bg-slate-900/95 border-b border-slate-800 text-xs gap-2">
+        {/* Helper Hint */}
+        <div className="flex items-center gap-1.5 text-[11px] font-medium min-w-0">
+          {activeTool === 'move' && (
+            <span className="text-blue-300 truncate">
+              💡 Arrastra cualquier nodo para reubicarlo
+            </span>
+          )}
+          {activeTool === 'add' && (
+            <span className="text-emerald-300 truncate font-semibold">
+              👉 Toca cualquier punto del lienzo para ubicar un vértice
+            </span>
+          )}
+          {activeTool === 'connect' && (
+            <span className="text-purple-300 truncate font-semibold animate-pulse">
+              {connectSourceIdx === null
+                ? '🔗 Toca el 1er vértice a conectar'
+                : `🔗 Toca otro vértice para unirlo con ${vertices[connectSourceIdx]?.label}`}
+            </span>
+          )}
+          {activeTool === 'delete' && (
+            <span className="text-rose-300 truncate font-semibold">
+              🗑️ Toca un vértice o arista para eliminarlo
+            </span>
+          )}
         </div>
-      )}
 
-      {activeTool === 'add' && (
-        <div className="absolute top-12 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-          <div className="bg-emerald-950/90 border border-emerald-500/50 text-emerald-200 text-xs px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5 backdrop-blur-sm">
-            <Info className="w-3 h-3 text-emerald-400" />
-            Toca cualquier punto del lienzo para ubicar un vértice
-          </div>
+        {/* Layout quick action buttons */}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            onClick={() => onApplyLayout('circular')}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-slate-300 hover:text-cyan-400 bg-slate-800/80 hover:bg-slate-800 active:scale-95 rounded-lg border border-slate-700/80 transition min-h-[34px]"
+            title="Acomodo Circular"
+          >
+            <CircleDot className="w-3.5 h-3.5 text-blue-400" />
+            <span className="text-[10px] font-semibold hidden xs:inline">Circular</span>
+          </button>
+          <button
+            onClick={() => onApplyLayout('grid')}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-slate-300 hover:text-cyan-400 bg-slate-800/80 hover:bg-slate-800 active:scale-95 rounded-lg border border-slate-700/80 transition min-h-[34px]"
+            title="Acomodo en Cuadrícula"
+          >
+            <Grid className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="text-[10px] font-semibold hidden xs:inline">Cuadrícula</span>
+          </button>
+          <button
+            onClick={() => onApplyLayout('random')}
+            className="flex items-center gap-1 px-2.5 py-1.5 text-slate-300 hover:text-cyan-400 bg-slate-800/80 hover:bg-slate-800 active:scale-95 rounded-lg border border-slate-700/80 transition min-h-[34px]"
+            title="Acomodo Aleatorio"
+          >
+            <Shuffle className="w-3.5 h-3.5 text-purple-400" />
+            <span className="text-[10px] font-semibold hidden xs:inline">Azar</span>
+          </button>
         </div>
-      )}
+      </div>
 
       {/* Interactive SVG Canvas */}
-      <div className="relative w-full h-[280px] sm:h-[320px] select-none touch-none overflow-hidden cursor-crosshair">
+      <div className="relative w-full h-[290px] sm:h-[330px] select-none touch-none overflow-hidden cursor-crosshair">
         <svg
           ref={svgRef}
           viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
@@ -282,11 +287,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
               <rect width="100" height="100" fill="url(#smallGrid)" />
               <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#233559" strokeWidth="1.2" />
             </pattern>
-            {/* Glow Filter for Active Elements */}
-            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="4" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
           </defs>
 
           {/* Grid Background */}
@@ -314,7 +314,7 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                     x2={v.x}
                     y2={v.y}
                     stroke="transparent"
-                    strokeWidth="24"
+                    strokeWidth="28"
                     className="cursor-pointer"
                     onClick={(e) => {
                       if (activeTool === 'delete') {
@@ -331,7 +331,6 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                     y2={v.y}
                     stroke={isHighlighted ? '#60A5FA' : '#475569'}
                     strokeWidth={isHighlighted ? '2.5' : '1.8'}
-                    strokeDasharray={isHighlighted ? 'none' : 'none'}
                     className="transition-colors duration-150"
                   />
                 </g>
@@ -339,16 +338,16 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
             })}
           </g>
 
-          {/* Connecting preview line when source node is selected */}
+          {/* Connecting preview animated ring when source node is selected */}
           {activeTool === 'connect' && connectSourceIdx !== null && vertices[connectSourceIdx] && (
             <circle
               cx={vertices[connectSourceIdx].x}
               cy={vertices[connectSourceIdx].y}
-              r="26"
+              r="28"
               fill="none"
-              stroke="#A855F7"
-              strokeWidth="2.5"
-              strokeDasharray="4 4"
+              stroke="#C084FC"
+              strokeWidth="3"
+              strokeDasharray="5 5"
               className="animate-spin"
               style={{ transformOrigin: `${vertices[connectSourceIdx].x}px ${vertices[connectSourceIdx].y}px` }}
             />
@@ -370,16 +369,24 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                   onPointerEnter={() => setHoveredVertexId(vertex.id)}
                   onPointerLeave={() => setHoveredVertexId(null)}
                 >
+                  {/* Invisible generous hit target for thick mobile fingers */}
+                  <circle
+                    cx={vertex.x}
+                    cy={vertex.y}
+                    r="28"
+                    fill="transparent"
+                  />
+
                   {/* Outer selection / glow ring */}
                   {(isSelectedForConnect || isDragging || isHovered) && (
                     <circle
                       cx={vertex.x}
                       cy={vertex.y}
-                      r="22"
+                      r="23"
                       fill="none"
                       stroke={isSelectedForConnect ? '#C084FC' : colorHex}
-                      strokeWidth="2"
-                      opacity="0.8"
+                      strokeWidth="2.5"
+                      opacity="0.85"
                     />
                   )}
 
@@ -387,51 +394,51 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
                   <circle
                     cx={vertex.x}
                     cy={vertex.y}
-                    r="16"
+                    r="17"
                     fill={colorHex}
                     stroke="#0B0F19"
                     strokeWidth="2.5"
-                    filter="drop-shadow(0 2px 5px rgba(0,0,0,0.5))"
+                    filter="drop-shadow(0 2px 6px rgba(0,0,0,0.6))"
                   />
 
                   {/* Vertex Label */}
                   <text
                     x={vertex.x}
-                    y={vertex.y + 4}
+                    y={vertex.y + 4.5}
                     textAnchor="middle"
                     fill="#FFFFFF"
-                    fontSize="11"
-                    fontWeight="700"
+                    fontSize="11.5"
+                    fontWeight="800"
                     fontFamily="sans-serif"
                     className="pointer-events-none select-none"
-                    style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+                    style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
                   >
                     {vertex.label}
                   </text>
 
                   {/* Floating Badge: Degree & Coords */}
                   <g
-                    transform={`translate(${vertex.x}, ${vertex.y - 22})`}
+                    transform={`translate(${vertex.x}, ${vertex.y - 23})`}
                     className="pointer-events-none"
                   >
                     <rect
-                      x="-26"
+                      x="-27"
                       y="-12"
-                      width="52"
-                      height="13"
-                      rx="6"
+                      width="54"
+                      height="14"
+                      rx="7"
                       fill="#0F172A"
                       stroke="#334155"
                       strokeWidth="0.8"
-                      opacity="0.9"
+                      opacity="0.95"
                     />
                     <text
                       x="0"
-                      y="-3"
+                      y="-2.5"
                       textAnchor="middle"
                       fill="#94A3B8"
-                      fontSize="8"
-                      fontWeight="600"
+                      fontSize="8.5"
+                      fontWeight="700"
                       className="font-mono"
                     >
                       g={vertex.degree} ({vertex.x},{vertex.y})
@@ -447,26 +454,26 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({
         {vertices.length === 0 && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-slate-500">
             <PlusCircle className="w-8 h-8 mb-2 opacity-40 text-emerald-400" />
-            <p className="text-sm font-medium">Lienzo vacío</p>
-            <p className="text-xs text-slate-600">
-              Selecciona <span className="text-emerald-400 font-semibold">+ Nodo</span> y toca para dibujar
+            <p className="text-sm font-semibold text-slate-300">Lienzo vacío</p>
+            <p className="text-xs text-slate-500">
+              Selecciona <span className="text-emerald-400 font-bold">+ Nodo</span> arriba y toca para dibujar
             </p>
           </div>
         )}
       </div>
 
       {/* Bottom Sub-bar: Vertex / Edge stats */}
-      <div className="flex items-center justify-between px-3 py-1.5 bg-slate-900/90 border-t border-slate-800/80 text-[11px] text-slate-400">
+      <div className="flex items-center justify-between px-3 py-2 bg-slate-900 border-t border-slate-800 text-[11px] text-slate-400">
         <div className="flex items-center gap-3">
           <span>
-            Vértices: <strong className="text-slate-200">{vertices.length}</strong>
+            Vértices: <strong className="text-slate-100 font-mono text-xs">{vertices.length}</strong>
           </span>
           <span>
-            Aristas: <strong className="text-slate-200">{edges.length}</strong>
+            Aristas: <strong className="text-slate-100 font-mono text-xs">{edges.length}</strong>
           </span>
         </div>
         <div className="text-slate-500 text-[10px]">
-          Arrastra para mover • Coordenadas ({viewBoxWidth}x{viewBoxHeight})
+          Arrastra para mover • Plano ({viewBoxWidth}x{viewBoxHeight})
         </div>
       </div>
     </div>
