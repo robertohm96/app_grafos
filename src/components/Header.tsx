@@ -18,11 +18,11 @@ export const Header: React.FC<HeaderProps> = ({
   onReset,
   onOpenSaveModal,
 }) => {
-  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showInfoDropdown, setShowInfoDropdown] = useState(false);
 
   return (
     <header
-      className="sticky top-0 z-40 w-full bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800/80 px-3.5 pb-2.5 transition-all shadow-md"
+      className="sticky top-0 z-40 w-full bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800/80 px-3.5 pb-2.5 transition-all shadow-md relative"
       style={{
         paddingTop: 'max(env(safe-area-inset-top, 0px), 44px)',
       }}
@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Right Action Group */}
         <div className="flex items-center gap-2 shrink-0">
-          {/* Chromatic Number Badge (Minimalist) */}
+          {/* Chromatic Number Badge */}
           <div
             className="flex items-center gap-1 px-3 py-1.5 bg-zinc-900 border border-zinc-700 rounded-xl shadow-sm min-h-[40px]"
             title="Número Cromático estimado por Welsh-Powell"
@@ -81,99 +81,123 @@ export const Header: React.FC<HeaderProps> = ({
             <RotateCcw className="w-4 h-4" />
           </button>
 
-          {/* Help Info Button */}
+          {/* Help Info Button ([?]) - Toggles downward info box */}
           <button
-            onClick={() => setShowInfoModal(true)}
-            className="w-10 h-10 flex items-center justify-center text-zinc-400 hover:text-zinc-100 bg-zinc-900 hover:bg-zinc-800 active:scale-95 rounded-xl border border-zinc-800 transition"
+            onClick={() => setShowInfoDropdown(!showInfoDropdown)}
+            className={`w-10 h-10 flex items-center justify-center active:scale-95 rounded-xl border transition ${
+              showInfoDropdown
+                ? 'bg-zinc-100 text-zinc-950 border-white shadow-md'
+                : 'text-zinc-400 hover:text-zinc-100 bg-zinc-900 hover:bg-zinc-800 border-zinc-800'
+            }`}
             title="Información y ayuda"
             aria-label="Ayuda"
           >
-            <HelpCircle className="w-4 h-4" />
+            <HelpCircle className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* Info / Graph Theory Guide Modal */}
-      {showInfoModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
-          onClick={() => setShowInfoModal(false)}
-        >
+      {/* Cuadro de texto hacia abajo (Dropdown Info Box directly below the header) */}
+      {showInfoDropdown && (
+        <>
+          {/* Backdrop */}
           <div
-            className="bg-zinc-900 border-t sm:border border-zinc-700 rounded-t-3xl sm:rounded-2xl w-full max-w-lg max-h-[85vh] overflow-hidden shadow-2xl flex flex-col animate-in slide-in-from-bottom-8 duration-200"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs"
+            onClick={() => setShowInfoDropdown(false)}
+          />
+
+          {/* Downward Information Box */}
+          <div
+            className="absolute right-3 left-3 sm:left-auto sm:w-[420px] top-full mt-2 z-50 bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in fade-in slide-in-from-top-3 duration-200"
             style={{
-              paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+              maxHeight: 'calc(100vh - 120px)',
             }}
           >
-            <div className="w-12 h-1 bg-zinc-700 rounded-full mx-auto mt-2.5 mb-1 sm:hidden shrink-0" />
-
-            <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 shrink-0 bg-zinc-900">
+            {/* Box Header */}
+            <div className="px-4 py-3 bg-zinc-950 border-b border-zinc-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <div className="p-1.5 bg-zinc-800 text-zinc-200 rounded-lg border border-zinc-700">
                   <BookOpen className="w-4 h-4" />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-zinc-100">
-                    Guía Teórica de Coloración
+                    Guía de Ayuda & Teoría
                   </h3>
                   <p className="text-[11px] text-zinc-400">
-                    Fundamentos y Algoritmos
+                    Información y funcionamiento de la aplicación
                   </p>
                 </div>
               </div>
               <button
-                onClick={() => setShowInfoModal(false)}
-                className="w-9 h-9 flex items-center justify-center text-zinc-300 hover:text-white rounded-lg bg-zinc-800 active:scale-95 border border-zinc-700 transition"
-                aria-label="Cerrar modal"
+                onClick={() => setShowInfoDropdown(false)}
+                className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white rounded-lg bg-zinc-800 active:scale-95 border border-zinc-700 transition"
+                aria-label="Cerrar ayuda"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-4 custom-scroll-bar space-y-3 text-xs text-zinc-300 leading-relaxed flex-1 pr-3 overflow-y-auto">
+            {/* Scrollable Content (Visible Scrollbar) */}
+            <div className="p-4 custom-scroll-bar space-y-3 text-xs text-zinc-300 leading-relaxed overflow-y-auto max-h-[60vh]">
+              {/* Card 1 */}
               <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-1">
                 <h4 className="font-bold text-zinc-100 text-xs">Coloración Propia de Vértices</h4>
                 <p className="text-zinc-400 text-[11px]">
-                  Asignación de colores tal que ningún par de vértices conectados comparta el mismo color.
+                  Es una asignación de colores a cada vértice del grafo de modo que dos vértices conectados por una arista nunca tengan el mismo color.
                 </p>
               </div>
 
+              {/* Card 2 */}
               <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-1">
-                <h4 className="font-bold text-zinc-100 text-xs">Número Cromático $\chi(G)$</h4>
+                <h4 className="font-bold text-zinc-100 text-xs">Número Cromático χ(G)</h4>
                 <p className="text-zinc-400 text-[11px]">
-                  Cantidad mínima de colores necesarios para una coloración propia del grafo.
+                  Representa el número mínimo de colores necesarios para lograr una coloración propia.
                 </p>
               </div>
 
+              {/* Card 3 */}
               <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-1">
                 <h4 className="font-bold text-zinc-100 text-xs">Algoritmo de Welsh-Powell</h4>
-                <ol className="list-decimal list-inside text-zinc-400 text-[11px] space-y-1">
-                  <li>Calcula el grado $g(v)$ de cada vértice.</li>
-                  <li>Ordena los vértices en orden decreciente de grados.</li>
-                  <li>Asigna un color a los vértices compatibles sin aristas comunes.</li>
-                  <li>Repite con el siguiente color hasta colorear todos.</li>
+                <ol className="list-decimal list-inside text-zinc-400 text-[11px] space-y-1 mt-1">
+                  <li>Calcula el grado de cada vértice.</li>
+                  <li>Ordena los vértices de mayor a menor grado.</li>
+                  <li>Asigna un color a los vértices compatibles que no tengan aristas entre sí.</li>
+                  <li>Repite con el siguiente color hasta colorear todo el grafo.</li>
                 </ol>
               </div>
 
+              {/* Card 4 */}
               <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-1">
                 <h4 className="font-bold text-zinc-100 text-xs">Teorema de Havel-Hakimi</h4>
                 <p className="text-zinc-400 text-[11px]">
-                  Permite validar y construir un grafo simple a partir de una secuencia de grados enteros.
+                  Permite determinar si una lista de grados enteros es realizable como un grafo simple y genera la construcción paso a paso.
+                </p>
+              </div>
+
+              {/* Card 5 */}
+              <div className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-1">
+                <h4 className="font-bold text-zinc-100 text-xs">Cómo usar los 2 modos:</h4>
+                <p className="text-zinc-400 text-[11px]">
+                  • <strong>Matriz ➔ Grafo:</strong> Edita la cuadrícula de ceros y unos o pega la matriz en texto; el grafo se proyecta al instante.<br/>
+                  • <strong>Grafo ➔ Matriz:</strong> Usa las herramientas táctiles del lienzo para mover, añadir nodos o conectar aristas; la matriz se genera en tiempo real debajo.
                 </p>
               </div>
             </div>
 
-            <div className="px-4 py-2 bg-zinc-950 border-t border-zinc-800 text-[11px] text-zinc-400 flex items-center justify-end shrink-0">
+            {/* Box Footer */}
+            <div className="px-4 py-2.5 bg-zinc-950 border-t border-zinc-800 flex items-center justify-between shrink-0">
+              <span className="text-[11px] text-zinc-500">
+                Desliza para leer toda la información
+              </span>
               <button
-                onClick={() => setShowInfoModal(false)}
-                className="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs rounded-lg font-medium transition"
+                onClick={() => setShowInfoDropdown(false)}
+                className="px-3 py-1.5 bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold rounded-lg transition"
               >
-                Cerrar
+                Entendido
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </header>
   );
